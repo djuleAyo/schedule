@@ -120,6 +120,20 @@ describe('Interval', () => {
             assert.isOk(actual1.end.getTime() === expected.end.getTime());
             assert.isOk(actual2.end.getTime() === expected.end.getTime());
         });
+
+        it('should return undefined when no intersect', () => {
+            let i1 = new Interval(nine, ten);
+            let i2 = new Interval(eleven, twelve);
+
+            assert.isOk(undefined === i1.intersect(i2));
+        });
+
+        it('should not intersect adjecent', () => {
+            let i1 = new Interval(nine, ten);
+            let i2 = new Interval(ten, eleven);
+
+            assert.isOk(i1.intersect(i2) === undefined)
+        });
     });
     
 });

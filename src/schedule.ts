@@ -11,13 +11,8 @@ import { Interval } from "./interval";
  * 4. These are no overlaps in appointments - this is what makes the schedule
  * simple.
  */
-export class Schedule extends Appointment {
+export class Schedule {
     
-    /**
-     * This WILL make difference in the implementation. When you do the analysis
-     * doc it
-     * TODO
-     */
     readonly appointments: Array<Appointment> = [];
 
     /**
@@ -25,9 +20,13 @@ export class Schedule extends Appointment {
      * These can only be a root in schedule tree.
      */
     constructor();
+    constructor(conf: Schedule.Conf);
     constructor(...args) {
 
-        super(new Interval(new Date(0), new Date(Number['MAX_SAFE_INTEGER'])));
+        // super(new Interval(new Date(0), new Date(Number['MAX_SAFE_INTEGER'])));
+        if (args.length === 1) {
+
+        }
     
     }
     
@@ -49,4 +48,34 @@ export class Schedule extends Appointment {
         });
         return retVal;
     }
+}
+
+export module Schedule
+{
+    /**
+     * If only interval is provided it is applied to all days
+     * If both interval and days are provided then days takes precedence
+     */
+    export type WeekIntervalConf = Interval | {
+        "mo"?: Interval,
+        "tu"?: Interval,
+        "we"?: Interval,
+        "th"?: Interval,
+        "fr"?: Interval,
+        "sa"?: Interval,
+        "su"?: Interval
+    };
+    /**
+     * Precedence is as follows:
+     * queryMiddler - disables all other conf
+     * Explicit - overrides patterns
+     * patters - the lowest
+     */
+    export type Conf = {
+        workingPattern?: WeekIntervalConf,
+        workingExplicit?: Array<Interval>,
+        excludePattern?: WeekIntervalConf,
+        excludeExplicit?: Array<Interval>,
+        queryMiddler?: (Interval) => boolean
+    };
 }

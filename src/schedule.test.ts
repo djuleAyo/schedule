@@ -1,5 +1,6 @@
 import { Schedule } from "./schedule";
 import { Interval } from "./interval";
+import * as ms from './util/ms';
 
 const assert = require('chai').assert;
 
@@ -7,6 +8,7 @@ let s: Schedule;
 let today: Interval;
 let nine: Date;
 let ten: Date;
+let eleven: Date;
 let nineToTen: Interval;
 
 describe('Schedule', () => {
@@ -18,6 +20,8 @@ describe('Schedule', () => {
         nine.setHours(9, 0, 0, 0);
         ten = new Date();
         ten.setHours(10, 0, 0, 0);
+        eleven = new Date();
+        eleven.setHours(11, 0, 0, 0);
         nineToTen = new Interval(nine, ten);
     })
 
@@ -35,13 +39,29 @@ describe('Schedule', () => {
     it('should show taken intervals as such in a query', () => {
         s.appoint(today);
 
-        console.log('today');
-        console.log(today);
-
-        console.log('schedule');
-        console.log(JSON.stringify(s, null, 2));
-
         assert.equal(s.query(today), false);
     });
+
+    it('should schedule adjecent intervals', () => {
+        let i1 = new Interval(nine, ms.hours);
+        let i2 = new Interval(ten, ms.hours);
+        let i3 = new Interval(eleven, ms.hours);
+
+        assert.isOk(
+            s.appoint(i1)
+            && s.appoint(i2)
+            && s.appoint(i3)
+            && s.appointments.length === 3
+        );
+    });
+
+    it('should not schedule when not free', () => {
+        let i1 = new Interval(nine, ms.hours + 11 * ms.minutes);
+        let subinterval = new Interval(nine, ms.hours);
+
+        assert.isOk(s.appoint(i1));
+        assert.isOk(!s.appoint(i1));
+        assert.isOk(!s.appoint(subinterval));
+    })
     
 });
