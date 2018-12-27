@@ -1,8 +1,8 @@
 import { Schedule } from "./schedule";
-import { Interval } from "./interval";
+import { ConcreteInterval } from "./concreteInterval";
 
 export class Activity extends Schedule
 {
-    private explicitIntervals: Array<Interval>;
+    private explicitIntervals: Array<ConcreteInterval>;
     
 }

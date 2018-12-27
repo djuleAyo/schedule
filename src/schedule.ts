@@ -1,5 +1,5 @@
 import { Appointment } from "./appointment";
-import { Interval } from "./interval";
+import { ConcreteInterval } from "./concreteInterval";
 
 /**
  * 4 main characteristics:
@@ -25,13 +25,13 @@ export class Schedule {
 
         // super(new Interval(new Date(0), new Date(Number['MAX_SAFE_INTEGER'])));
         if (args.length === 1) {
-
+            
         }
     
     }
     
 
-    public appoint(interval: Interval): boolean
+    public appoint(interval: ConcreteInterval): boolean
     {
         const isFree = this.query(interval);
         if (!isFree) return false;
@@ -40,7 +40,7 @@ export class Schedule {
         return true;
     }
 
-    public query(interval: Interval): boolean
+    public query(interval: ConcreteInterval): boolean
     {
         let retVal = true;
         this.appointments.forEach(appointment => {
@@ -56,14 +56,14 @@ export module Schedule
      * If only interval is provided it is applied to all days
      * If both interval and days are provided then days takes precedence
      */
-    export type WeekIntervalConf = Interval | {
-        "mo"?: Interval,
-        "tu"?: Interval,
-        "we"?: Interval,
-        "th"?: Interval,
-        "fr"?: Interval,
-        "sa"?: Interval,
-        "su"?: Interval
+    export type WeekIntervalConf = ConcreteInterval | {
+        "mo"?: ConcreteInterval,
+        "tu"?: ConcreteInterval,
+        "we"?: ConcreteInterval,
+        "th"?: ConcreteInterval,
+        "fr"?: ConcreteInterval,
+        "sa"?: ConcreteInterval,
+        "su"?: ConcreteInterval
     };
     /**
      * Precedence is as follows:
@@ -73,9 +73,13 @@ export module Schedule
      */
     export type Conf = {
         workingPattern?: WeekIntervalConf,
-        workingExplicit?: Array<Interval>,
+        workingExplicit?: Array<ConcreteInterval>,
         excludePattern?: WeekIntervalConf,
-        excludeExplicit?: Array<Interval>,
-        queryMiddler?: (Interval) => boolean
+        excludeExplicit?: Array<ConcreteInterval>,
+        queryMiddler?: (Interval) => boolean,
+
+        cooldown?: number,
+        minDuration?: number,
+        timeUnit?: number
     };
 }

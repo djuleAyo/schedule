@@ -1,4 +1,4 @@
-import { Interval } from "./interval";
+import { ConcreteInterval } from "./concreteInterval";
 import * as ms from './util/ms';
 
 let assert = require('chai').assert;
@@ -18,7 +18,7 @@ describe('Interval', () => {
     });
 
     it('should construct today by default', () => {
-        let i = new Interval();
+        let i = new ConcreteInterval();
         let now = new Date();
 
         assert.isOk(i.start.getTime() === now.setHours(0, 0, 0, 0));
@@ -28,7 +28,7 @@ describe('Interval', () => {
     it('should take 1 arg - date and make 0 duration interval', () => {
         let now = new Date();
 
-        let i = new Interval(now);
+        let i = new ConcreteInterval(now);
 
         assert.isOk(i.start === now);
         assert.isOk(i.start.getTime() === i.end.getTime());
@@ -38,7 +38,7 @@ describe('Interval', () => {
         let now = new Date();
         let later = new Date(now.getTime() + ms.minutes);
 
-        let i = new Interval(now, later);
+        let i = new ConcreteInterval(now, later);
 
         assert.isOk(now === i.start);
         assert.isOk(later === i.end);
@@ -50,49 +50,49 @@ describe('Interval', () => {
         let before = new Date(now.getTime() - 24 * ms.hours);
 
         assert.throws(() => {
-            let i = new Interval(now, before);
+            let i = new ConcreteInterval(now, before);
         });
     });
 
     describe('contains', () => {
         it('should return true for: is now in today?', () => {
-            let i = new Interval();
+            let i = new ConcreteInterval();
             let now = new Date();
 
             assert.isOk(i.contains(now));
         });
 
         it('should return false for: is yesterday this time in today', () => {
-            let i = new Interval();
+            let i = new ConcreteInterval();
             let now = new Date( new Date().getTime() - 24 * 60 * 60 * 1000);
             
             assert.isOk(!i.contains(now));
         });
 
         it('should contain it self', () => {
-            let i = new Interval();
+            let i = new ConcreteInterval();
             assert.isOk(i.contains(i));
         });
 
         it('should be true for: today contains now-interval', () => {
-            let i = new Interval();
-            let now = new Interval(new Date());
+            let i = new ConcreteInterval();
+            let now = new ConcreteInterval(new Date());
 
             assert.isOk(i.contains(now));
         });
 
         it('should be true for: 10-12 contains 10-11', () => {
 
-            let i1 = new Interval(ten, twelve);
-            let i2 = new Interval(ten, eleven);
+            let i1 = new ConcreteInterval(ten, twelve);
+            let i2 = new ConcreteInterval(ten, eleven);
 
             assert.isOk(i1.contains(i2));
         });
 
         it('should be false for: 10-12 contains 9-11', () => {
 
-            let i1 = new Interval(ten, twelve);
-            let i2 = new Interval(nine, eleven);
+            let i1 = new ConcreteInterval(ten, twelve);
+            let i2 = new ConcreteInterval(nine, eleven);
 
             assert.isOk(!i1.contains(i2));
         });
@@ -100,19 +100,19 @@ describe('Interval', () => {
 
     describe('intersect', () => {
         it('should returt the original if contained', () => {
-            let i1 = new Interval(ten, twelve);
-            let i2 = new Interval(ten, eleven);
+            let i1 = new ConcreteInterval(ten, twelve);
+            let i2 = new ConcreteInterval(ten, eleven);
 
             assert.isOk(i1.intersect(i2) === i2);
         });
 
         it('should return intersected interval', () => {
-            let i1 = new Interval(nine, eleven);
-            let i2 = new Interval(ten, twelve);
+            let i1 = new ConcreteInterval(nine, eleven);
+            let i2 = new ConcreteInterval(ten, twelve);
 
             let actual1 = i1.intersect(i2);
             let actual2 = i2.intersect(i1);
-            let expected = new Interval(ten, eleven);
+            let expected = new ConcreteInterval(ten, eleven);
 
             assert.isOk(actual1.start.getTime() === expected.start.getTime());
             assert.isOk(actual2.start.getTime() === expected.start.getTime());
@@ -122,15 +122,15 @@ describe('Interval', () => {
         });
 
         it('should return undefined when no intersect', () => {
-            let i1 = new Interval(nine, ten);
-            let i2 = new Interval(eleven, twelve);
+            let i1 = new ConcreteInterval(nine, ten);
+            let i2 = new ConcreteInterval(eleven, twelve);
 
             assert.isOk(undefined === i1.intersect(i2));
         });
 
         it('should not intersect adjecent', () => {
-            let i1 = new Interval(nine, ten);
-            let i2 = new Interval(ten, eleven);
+            let i1 = new ConcreteInterval(nine, ten);
+            let i2 = new ConcreteInterval(ten, eleven);
 
             assert.isOk(i1.intersect(i2) === undefined)
         });

@@ -1,8 +1,8 @@
 import { Schedule } from "./schedule";
-import { Interval } from "./interval";
+import { ConcreteInterval } from "./concreteInterval";
 
 let s = new Schedule();
-let today = new Interval();
+let today = new ConcreteInterval();
 
 let isFree = s.query(today);
 
