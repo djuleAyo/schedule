@@ -3,6 +3,16 @@ export const minutes = seconds * 60;
 export const hours = minutes * 60;
 export const days = hours * 24;
 
+export const dayNames = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday'
+];
+
 /**
  * Returns number of ms from day start
  */

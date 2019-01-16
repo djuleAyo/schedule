@@ -135,5 +135,14 @@ describe('Interval', () => {
             assert.isOk(i1.intersect(i2) === undefined)
         });
     });
+
+    describe('soft contains', () => {
+        it('should return true if is contained hours wise but date match is NOT a must', () => {
+            
+        });
+        it('should return false if is not contained in hours', () => {
+            
+        });
+    });
     
 });

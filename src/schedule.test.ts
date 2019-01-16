@@ -4,12 +4,18 @@ import * as ms from './util/ms';
 
 const assert = require('chai').assert;
 
+
+// Test data init---------------------------------------------------------------
 let s: Schedule;
 let today: ConcreteInterval;
 let nine: Date;
 let ten: Date;
 let eleven: Date;
 let nineToTen: ConcreteInterval;
+let nineToEleven: ConcreteInterval;
+
+let nineElevenScheduleConf: Schedule.WeekIntervalConf;
+let nineElevenSchedule: Schedule;
 
 describe('Schedule', () => {
 
@@ -23,7 +29,24 @@ describe('Schedule', () => {
         eleven = new Date();
         eleven.setHours(11, 0, 0, 0);
         nineToTen = new ConcreteInterval(nine, ten);
-    })
+        nineToEleven = new ConcreteInterval(nine, eleven);
+
+        nineElevenScheduleConf = {
+            'monday': nineToEleven,
+            'tuesday': nineToEleven,
+            'wednesday': nineToEleven,
+            'thursday': nineToEleven,
+            'friday': nineToEleven,
+            'saturday': nineToEleven,
+            'sunday': nineToEleven,
+        }
+
+        nineElevenSchedule = new Schedule({
+            workingPattern: nineElevenScheduleConf
+        });
+    });
+
+    // end test data init ------------------------------------------------------
 
     it('should show any interval as free after contruction w/o args', () => {
         assert.isOk(s.query(new ConcreteInterval(new Date())));
@@ -62,6 +85,28 @@ describe('Schedule', () => {
         assert.isOk(s.appoint(i1));
         assert.isOk(!s.appoint(i1));
         assert.isOk(!s.appoint(subinterval));
-    })
+    });
+
+    describe('working pattern', () => {
+        it('should be able to take working pattern in constructor as concrete interval', () => {
+            let s = new Schedule({
+                workingPattern: new ConcreteInterval(nine, eleven)
+            });
+            assert.deepEqual(s.workingPattern, nineElevenScheduleConf);
+        });
+        it('should be able to take working pattern in constructor as week config', () => {
+            let s = new Schedule({
+                workingPattern: nineElevenScheduleConf
+            });
+            assert.deepEqual(s.workingPattern, nineElevenScheduleConf);
+        });
+        it('should direct a query as experted', () => {
+            assert.isOk(!nineElevenSchedule.query(
+                new ConcreteInterval(new Date(new Date().setHours(12)))
+            ));
+        });
+    });
+
+    
     
 });

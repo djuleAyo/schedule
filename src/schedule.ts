@@ -1,5 +1,6 @@
 import { Appointment } from "./appointment";
 import { ConcreteInterval } from "./concreteInterval";
+import * as ms from './util/ms';
 
 /**
  * 4 main characteristics:
@@ -14,6 +15,7 @@ import { ConcreteInterval } from "./concreteInterval";
 export class Schedule {
     
     readonly appointments: Array<Appointment> = [];
+    readonly workingPattern: Schedule.Conf = {};
 
     /**
      * With no arguments the schedule represents timeline. It is infinite.
@@ -25,11 +27,22 @@ export class Schedule {
 
         // super(new Interval(new Date(0), new Date(Number['MAX_SAFE_INTEGER'])));
         if (args.length === 1) {
-            
+            let conf = args[0];
+            if (conf.workingPattern) {
+                if (conf.workingPattern.constructor == ConcreteInterval)
+                    this.initWorkingPatternInterval(conf.workingPattern);
+                else
+                    this.workingPattern = conf.workingPattern;
+            }
         }
     
     }
-    
+    private initWorkingPatternInterval(interval: ConcreteInterval): void
+    {
+        ms.dayNames.forEach(dayName => {
+            this.workingPattern[dayName] = interval;
+        });
+    }    
 
     public appoint(interval: ConcreteInterval): boolean
     {
@@ -43,6 +56,17 @@ export class Schedule {
     public query(interval: ConcreteInterval): boolean
     {
         let retVal = true;
+
+        // check if interval meets workingPattern
+        
+        if (
+            !this.workingPattern[ms.dayNames[interval.start.getUTCDay() - 1]]
+            .softContains(interval)    
+        ) {
+            return false;
+        }
+
+        // check if interval is not contained in existing appointments
         this.appointments.forEach(appointment => {
             if(appointment.interval.intersect(interval)) retVal = false;
         });
@@ -57,14 +81,15 @@ export module Schedule
      * If both interval and days are provided then days takes precedence
      */
     export type WeekIntervalConf = ConcreteInterval | {
-        "mo"?: ConcreteInterval,
-        "tu"?: ConcreteInterval,
-        "we"?: ConcreteInterval,
-        "th"?: ConcreteInterval,
-        "fr"?: ConcreteInterval,
-        "sa"?: ConcreteInterval,
-        "su"?: ConcreteInterval
+        "monday"?: ConcreteInterval,
+        "tuesday"?: ConcreteInterval,
+        "wednesday"?: ConcreteInterval,
+        "thursday"?: ConcreteInterval,
+        "friday"?: ConcreteInterval,
+        "saturday"?: ConcreteInterval,
+        "sunday"?: ConcreteInterval
     };
+    
     /**
      * Precedence is as follows:
      * queryMiddler - disables all other conf
