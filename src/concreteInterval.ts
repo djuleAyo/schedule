@@ -1,3 +1,5 @@
+import * as ms from './util/ms';
+
 export class ConcreteInterval {
     
     readonly start: Date;
@@ -90,6 +92,50 @@ export class ConcreteInterval {
             }
         }
     }
+    public softContains(date: Date): boolean;
+    public softContains(interval: ConcreteInterval): boolean;
+    public softContains(...args) {
+        
+        if (args.length === 1) {
+
+            if (args[0].constructor === Date) {
+                let date = args[0];
+
+                let hours = date.getHours();
+                let minutes = date.getMinutes();
+                let seconds = date.getSeconds();
+                let mseconds = date.getMilliseconds();
+
+                return this.contains(
+                    new Date(
+                        new Date(this.start.getTime())
+                            .setHours(hours, minutes, seconds, mseconds)
+                    )
+                );
+            }
+
+            if(args[0].constructor === ConcreteInterval) {
+                let interval = args[0];
+                let start = interval.start;
+                let end = interval.end;
+                
+                let startHours = start.getHours();
+                let startMinutes = start.getMinutes();
+                let startSeconds = start.getSeconds();
+                let startMseconds = start.getMilliseconds();
+
+                let endHours = start.getHours();
+                let endMinutes = start.getMinutes();
+                let endSeconds = start.getSeconds();
+                let endMseconds = start.getMilliseconds();
+
+                return this.contains(new ConcreteInterval(
+                    new Date(new Date(this.start.getTime()).setHours(startHours, startMinutes, startSeconds, startMseconds)),
+                    new Date(new Date(this.start.getTime()).setHours(endHours, endMinutes, endSeconds, endMseconds)),
+                ));
+            }
+        }
+    }
 
     
     public minus(interval: ConcreteInterval): [ConcreteInterval, ConcreteInterval] | ConcreteInterval | undefined
@@ -112,4 +158,5 @@ export class ConcreteInterval {
 
         return [undefined, undefined];
     }
+
 }

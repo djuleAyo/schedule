@@ -137,12 +137,35 @@ describe('Interval', () => {
     });
 
     describe('soft contains', () => {
-        it('should return true if is contained hours wise but date match is NOT a must', () => {
-            
+        it('should return true if passed param is contained hours wise but date match is NOT a must', () => {
+            let nineTen = new ConcreteInterval(nine, ten);
+            let nineEleven = new ConcreteInterval(
+                new Date(nine.getTime() - 24 * ms.hours), 
+                new Date(eleven.getTime() - 24 * ms.hours), 
+            );
+            assert.isOk(nineEleven.softContains(nineTen));
         });
         it('should return false if is not contained in hours', () => {
+            let nineTen = new ConcreteInterval(nine, ten);
+            let nineEleven = new ConcreteInterval(
+                new Date(nine.getTime() - 24 * ms.hours), 
+                new Date(eleven.getTime() - 24 * ms.hours), 
+            );
+            assert.isOk(nineTen.softContains(nineEleven));
+        });
+        it('should work with both dates and intervals', () => {
+            let nineTen = new ConcreteInterval(nine, ten);
+            let yesterdayIn = new Date(nine.getTime() - 24 * ms.hours + 25);
+            let yesterdayOut = new Date(nine.getTime() - 24 * ms.hours - 25);
             
+            console.log( nineTen );
+            console.log( yesterdayIn );
+            console.log( yesterdayOut );
+
+            assert.isOk(nineTen.softContains(yesterdayIn));
+            assert.isOk(!nineTen.softContains(yesterdayOut));
         });
     });
+
     
 });
