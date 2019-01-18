@@ -1,34 +1,33 @@
-import * as ms from './util/ms';
-import { Schedule } from "./schedule";
 import { ConcreteInterval } from "./concreteInterval";
+import { Schedule } from "./schedule";
 
-let s = new Schedule();
-let today = new ConcreteInterval();
-
-// let isFree = s.query(today);
-
-// let isAppointed = s.appoint(today);
-
-// isFree = s.query(today);
-
-
-let ten = new Date();
-let eleven = new Date();
-let twelve = new Date();
 let nine = new Date();
-
-ten.setHours(10, 0, 0, 0);
-eleven.setHours(11, 0, 0, 0);
-twelve.setHours(12, 0, 0, 0);
 nine.setHours(9, 0, 0, 0);
+let ten = new Date();
+ten.setHours(10, 0, 0, 0);
+let eleven = new Date();
+eleven.setHours(11, 0, 0, 0);
 
+let nineToEleven = new ConcreteInterval(nine, eleven);
 
-let nineTen = new ConcreteInterval(nine, ten);
-let yesterdayIn = new Date(nine.getTime() - 24 * ms.hours + 25);
-let yesterdayOut = new Date(nine.getTime() - 24 * ms.hours - 25);
+const nineElevenScheduleConf = {
+    'monday': nineToEleven,
+    'tuesday': nineToEleven,
+    'wednesday': nineToEleven,
+    'thursday': nineToEleven,
+    'friday': nineToEleven,
+    'saturday': nineToEleven,
+    'sunday': nineToEleven,
+}
 
-console.log( nineTen );
-console.log( yesterdayIn );
-console.log( yesterdayOut );
+let nineElevenSchedule = new Schedule({
+    workingPattern: nineElevenScheduleConf
+});
 
-console.log( nineTen.softContains(yesterdayIn));
+let today = new ConcreteInterval();
+let okInterval = new ConcreteInterval(new Date(new Date().setHours(20)));
+console.log( today );
+console.log( okInterval );
+
+nineElevenSchedule.addWorkingExplicit(today);
+console.log( nineElevenSchedule.query(okInterval) );

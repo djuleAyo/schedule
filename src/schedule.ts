@@ -16,6 +16,7 @@ export class Schedule {
     
     readonly appointments: Array<Appointment> = [];
     readonly workingPattern: Schedule.Conf = {};
+    public workingExplicit: Array<ConcreteInterval> = [];
 
     /**
      * With no arguments the schedule represents timeline. It is infinite.
@@ -34,9 +35,13 @@ export class Schedule {
                 else
                     this.workingPattern = conf.workingPattern;
             }
+            if (conf.workingExplicit) {
+                this.workingExplicit = conf.workingExplicit;
+            }
         }
     
     }
+
     private initWorkingPatternInterval(interval: ConcreteInterval): void
     {
         ms.dayNames.forEach(dayName => {
@@ -44,6 +49,10 @@ export class Schedule {
         });
     }    
 
+    /**
+     * Appointment can be declined since interval status in schedule is dynamic.
+     * Hence boolean is returned to show if appointemnt is accepted.
+     */
     public appoint(interval: ConcreteInterval): boolean
     {
         const isFree = this.query(interval);
@@ -53,20 +62,64 @@ export class Schedule {
         return true;
     }
 
+    /**
+     * Query if given interval is available for appointment
+     */
     public query(interval: ConcreteInterval): boolean
     {
-        let retVal = true;
+        // the pipeline of checking conditions:
+        // explecitExclude && excludePattern && (workingExplicit || workingPattern) && appointments
 
-        // check if interval meets workingPattern
+        return (this.queryWorkingExplicit(interval) || this.queryWorkingPattern(interval)) 
+            && this.queryAppointments(interval);
+    }
+    
+    public addWorkingExplicit(interval: ConcreteInterval): void
+    {
+        this.workingExplicit.push(interval);
+    }
+
+    public removeWorkingExplicit(interval: ConcreteInterval): void
+    {
+        this.workingExplicit = this.workingExplicit.filter(workingInterval => {
+            return !workingInterval.equals(interval)
+        });
+    }
+
+    /**
+     * Query if interval meets working parretn. If no working pattern is configured
+     * it is met uncoditionaly
+     */
+    private queryWorkingPattern(interval: ConcreteInterval): boolean
+    {
+        let dayName = interval.getDayName();
         
-        if (
-            !this.workingPattern[ms.dayNames[interval.start.getUTCDay() - 1]]
-            .softContains(interval)    
-        ) {
-            return false;
-        }
+        // in english: if there is no config its satisfied. 
+        // if config and NOT contained not satistfied
+        let condition = this.workingPattern && dayName in this.workingPattern
+            && !this.workingPattern[dayName].softContains(interval);
+        
+        return condition ? false : true;
+    }
 
-        // check if interval is not contained in existing appointments
+    /**
+     * Query if interval meets working explicit entries.
+     */
+    private queryWorkingExplicit(interval: ConcreteInterval): boolean
+    {
+        let retVal = false;
+        this.workingExplicit.forEach(workingInterval => {
+            if (workingInterval.contains(interval)) retVal = true;
+        });
+        return retVal;
+    }
+
+    /**
+     * Query if passed interval overlaps with stored appointments.
+     */
+    private queryAppointments(interval: ConcreteInterval): boolean
+    {
+        let retVal = true;
         this.appointments.forEach(appointment => {
             if(appointment.interval.intersect(interval)) retVal = false;
         });

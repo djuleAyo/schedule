@@ -1,6 +1,7 @@
 import { Schedule } from "./schedule";
 import { ConcreteInterval } from "./concreteInterval";
 import * as ms from './util/ms';
+import { ok } from "assert";
 
 const assert = require('chai').assert;
 
@@ -100,10 +101,45 @@ describe('Schedule', () => {
             });
             assert.deepEqual(s.workingPattern, nineElevenScheduleConf);
         });
-        it('should direct a query as experted', () => {
+        it('should direct a query as expected', () => {
             assert.isOk(!nineElevenSchedule.query(
                 new ConcreteInterval(new Date(new Date().setHours(12)))
             ));
+            assert.isOk(nineElevenSchedule.query(
+                new ConcreteInterval(new Date(new Date().setHours(10)))
+            ));
+            assert.isOk(nineElevenSchedule.appoint(
+                new ConcreteInterval(new Date(new Date().setHours(10)))
+            ));
+            assert.isOk(!nineElevenSchedule.query(
+                new ConcreteInterval(new Date(new Date().setHours(10)))
+            ));
+        });
+    });
+
+    describe('worknig explicit', () => {
+        
+        it('should be able to take worknig explicit in constructor as part of config', () => {
+            let s = new Schedule({
+                workingExplicit: [nineToEleven]
+            });
+            assert.deepEqual(s.workingExplicit, [nineToEleven]);
+        });
+
+        it('should be able to reconfigure working explicit', () => {
+            s.addWorkingExplicit(nineToEleven);
+            assert.isOk(s.workingExplicit.find(interval => interval.equals(nineToEleven)));
+        });
+        it('should direct a query as expected', () => {
+            let today = new ConcreteInterval();
+            let okInterval = new ConcreteInterval(new Date(new Date().setHours(20)));
+            console.log( today );
+            console.log( okInterval );
+            
+            nineElevenSchedule.addWorkingExplicit(today);
+            assert.isOk(
+                nineElevenSchedule.query(okInterval)
+            );
         });
     });
 

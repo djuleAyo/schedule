@@ -159,4 +159,15 @@ export class ConcreteInterval {
         return [undefined, undefined];
     }
 
+    public getDayName()
+    {
+        return ms.dayNames[this.start.getUTCDay() - 1];
+    }
+
+    equals(interval: ConcreteInterval): boolean
+    {
+        return this.start.getTime() === interval.start.getTime()
+            && this.end.getTime() === interval.end.getTime();
+    }
+
 }
