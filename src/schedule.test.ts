@@ -12,6 +12,7 @@ let today: ConcreteInterval;
 let nine: Date;
 let ten: Date;
 let eleven: Date;
+let twelve: Date;
 let nineToTen: ConcreteInterval;
 let nineToEleven: ConcreteInterval;
 
@@ -29,6 +30,8 @@ describe('Schedule', () => {
         ten.setHours(10, 0, 0, 0);
         eleven = new Date();
         eleven.setHours(11, 0, 0, 0);
+        twelve = new Date();
+        twelve.setHours(11, 0, 0, 0);
         nineToTen = new ConcreteInterval(nine, ten);
         nineToEleven = new ConcreteInterval(nine, eleven);
 
@@ -126,16 +129,15 @@ describe('Schedule', () => {
             assert.deepEqual(s.workingExplicit, [nineToEleven]);
         });
 
-        it('should be able to reconfigure working explicit', () => {
+        it('should be able to add working explicit', () => {
             s.addWorkingExplicit(nineToEleven);
             assert.isOk(s.workingExplicit.find(interval => interval.equals(nineToEleven)));
         });
         it('should direct a query as expected', () => {
             let today = new ConcreteInterval();
             let okInterval = new ConcreteInterval(new Date(new Date().setHours(20)));
-            console.log( today );
-            console.log( okInterval );
             
+            assert.isOk(!nineElevenSchedule.query(okInterval));
             nineElevenSchedule.addWorkingExplicit(today);
             assert.isOk(
                 nineElevenSchedule.query(okInterval)
@@ -143,6 +145,33 @@ describe('Schedule', () => {
         });
     });
 
-    
-    
+    describe('exclude pattern', () => {
+        it('should be able to take exclude pattern in constructor as concrete interval', () => {
+            let s = new Schedule({
+                excludePattern: new ConcreteInterval(nine, eleven)
+            });
+            assert.deepEqual(s.excludePattern, nineElevenScheduleConf);
+        });
+        it('should be able to take exclude pattern in constructor as week config', () => {
+            let s = new Schedule({
+                excludePattern: nineElevenScheduleConf
+            });
+            assert.deepEqual(s.excludePattern, nineElevenScheduleConf);
+        });
+        it('should direct a query as expected', () => {
+            let s = new Schedule({
+                workingPattern: nineElevenScheduleConf,
+                excludePattern: nineElevenScheduleConf
+            })
+            assert.isOk(!s.query(
+                new ConcreteInterval(new Date(new Date().setHours(12)))
+            ));
+            assert.isOk(!s.query(
+                new ConcreteInterval(new Date(new Date().setHours(10)))
+            ));
+            assert.isOk(!s.query(
+                new ConcreteInterval(nine, twelve)
+            ));
+        });
+    });
 });

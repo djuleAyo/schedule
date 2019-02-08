@@ -17,6 +17,7 @@ export class Schedule {
     readonly appointments: Array<Appointment> = [];
     readonly workingPattern: Schedule.Conf = {};
     public workingExplicit: Array<ConcreteInterval> = [];
+    readonly excludePattern: Schedule.Conf = {};
 
     /**
      * With no arguments the schedule represents timeline. It is infinite.
@@ -38,6 +39,12 @@ export class Schedule {
             if (conf.workingExplicit) {
                 this.workingExplicit = conf.workingExplicit;
             }
+            if (conf.excludePattern) {
+                if (conf.excludePattern.constructor == ConcreteInterval)
+                    this.initExcludePatternInterval(conf.excludePattern);
+                else
+                    this.excludePattern = conf.excludePattern;
+            }
         }
     
     }
@@ -47,7 +54,14 @@ export class Schedule {
         ms.dayNames.forEach(dayName => {
             this.workingPattern[dayName] = interval;
         });
-    }    
+    }
+
+    private initExcludePatternInterval(interval: ConcreteInterval): void
+    {
+        ms.dayNames.forEach(dayName => {
+            this.excludePattern[dayName] = interval;
+        });
+    }
 
     /**
      * Appointment can be declined since interval status in schedule is dynamic.
@@ -70,7 +84,8 @@ export class Schedule {
         // the pipeline of checking conditions:
         // explecitExclude && excludePattern && (workingExplicit || workingPattern) && appointments
 
-        return (this.queryWorkingExplicit(interval) || this.queryWorkingPattern(interval)) 
+        return this.queryExcludePattern(interval)
+            && (this.queryWorkingExplicit(interval) || this.queryWorkingPattern(interval)) 
             && this.queryAppointments(interval);
     }
     
@@ -94,10 +109,21 @@ export class Schedule {
     {
         let dayName = interval.getDayName();
         
-        // in english: if there is no config its satisfied. 
-        // if config and NOT contained not satistfied
         let condition = this.workingPattern && dayName in this.workingPattern
             && !this.workingPattern[dayName].softContains(interval);
+        
+        return condition ? false : true;
+    }
+
+    private queryExcludePattern(interval: ConcreteInterval): boolean
+    {
+        let dayName = interval.getDayName();
+        
+        let condition = this.excludePattern && dayName in this.excludePattern
+            && this.excludePattern[dayName].softContains(interval);
+        
+        console.log( `soft contains ${this.excludePattern && dayName in this.excludePattern ? this.excludePattern[dayName].softContains(interval): "no value"}` );
+        console.log( `exclude pattern is ${condition}` );
         
         return condition ? false : true;
     }

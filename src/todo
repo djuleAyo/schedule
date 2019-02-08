@@ -1,9 +1,7 @@
-add date set as root of time types
+add soft intersect
+make pattern queries on soft intersect not on contains
+implement exclude specific
+hard test limits etc
 
-implement dailyInterval and test
-
-consider configuring scedule with middlers only
-
-implement and test configuration
-
-make the component - frontend
+make conf handler
+make a component
