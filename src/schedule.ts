@@ -120,10 +120,7 @@ export class Schedule {
         let dayName = interval.getDayName();
         
         let condition = this.excludePattern && dayName in this.excludePattern
-            && this.excludePattern[dayName].softContains(interval);
-        
-        console.log( `soft contains ${this.excludePattern && dayName in this.excludePattern ? this.excludePattern[dayName].softContains(interval): "no value"}` );
-        console.log( `exclude pattern is ${condition}` );
+            && this.excludePattern[dayName].softIntersect(interval);
         
         return condition ? false : true;
     }

@@ -136,7 +136,7 @@ describe('Interval', () => {
         });
     });
 
-    describe('soft contains', () => {
+    describe('Soft contains', () => {
         it('should return true if passed param is contained hours wise but date match is NOT a must', () => {
             let nineTen = new ConcreteInterval(nine, ten);
             let nineEleven = new ConcreteInterval(
@@ -145,25 +145,43 @@ describe('Interval', () => {
             );
             assert.isOk(nineEleven.softContains(nineTen));
         });
-        it('should return false if is not contained in hours', () => {
+        it('should return false if is not intersect in hours', () => {
             let nineTen = new ConcreteInterval(nine, ten);
             let nineEleven = new ConcreteInterval(
                 new Date(nine.getTime() - 24 * ms.hours), 
                 new Date(eleven.getTime() - 24 * ms.hours), 
             );
-            assert.isOk(nineTen.softContains(nineEleven));
+            assert.isOk(!nineTen.softContains(nineEleven));
         });
         it('should work with both dates and intervals', () => {
             let nineTen = new ConcreteInterval(nine, ten);
             let yesterdayIn = new Date(nine.getTime() - 24 * ms.hours + 25);
             let yesterdayOut = new Date(nine.getTime() - 24 * ms.hours - 25);
-            
-            console.log( nineTen );
-            console.log( yesterdayIn );
-            console.log( yesterdayOut );
 
             assert.isOk(nineTen.softContains(yesterdayIn));
             assert.isOk(!nineTen.softContains(yesterdayOut));
+        });
+    });
+
+    describe('Soft intersect', () => {
+        it('should return true if intervals overlap no matter the date', () => {
+            let nineEleven = new ConcreteInterval(nine, eleven);
+            let tenTwelve = new ConcreteInterval(
+                new Date(ten.getTime() - ms.days),
+                new Date(twelve.getTime() - ms.days)
+            );
+
+            assert.isOk(undefined !== nineEleven.softIntersect(tenTwelve));
+        });
+
+        it('should return false if intervals dont overlap no matter the date', () => {
+            let nineTen = new ConcreteInterval(nine, ten);
+            let elevenTwelve = new ConcreteInterval(
+                new Date(ten.getTime() - ms.days),
+                new Date(twelve.getTime() - ms.days)
+            );
+
+            assert.isOk(undefined === nineTen.softIntersect(elevenTwelve));
         });
     });
 

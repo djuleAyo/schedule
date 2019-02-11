@@ -1,16 +1,20 @@
 import { ConcreteInterval } from "./concreteInterval";
+import * as ms from './util/ms';
 import { Schedule } from "./schedule";
 
-let nine = new Date();
-nine.setHours(9, 0, 0, 0);
 let ten = new Date();
-ten.setHours(10, 0, 0, 0);
 let eleven = new Date();
+let twelve = new Date();
+let nine = new Date();
+
+ten.setHours(10, 0, 0, 0);
 eleven.setHours(11, 0, 0, 0);
+twelve.setHours(12, 0, 0, 0);
+nine.setHours(9, 0, 0, 0);
 
 let nineToEleven = new ConcreteInterval(nine, eleven);
 
-const nineElevenScheduleConf = {
+let nineElevenScheduleConf = {
     'monday': nineToEleven,
     'tuesday': nineToEleven,
     'wednesday': nineToEleven,
@@ -20,14 +24,16 @@ const nineElevenScheduleConf = {
     'sunday': nineToEleven,
 }
 
-let nineElevenSchedule = new Schedule({
-    workingPattern: nineElevenScheduleConf
-});
+let nineTen = new ConcreteInterval(nine, ten);
+let elevenTwelve = new ConcreteInterval(
+    new Date(ten.getTime() - ms.days),
+    new Date(twelve.getTime() - ms.days)
+);
 
-let today = new ConcreteInterval();
-let okInterval = new ConcreteInterval(new Date(new Date().setHours(20)));
-console.log( today );
-console.log( okInterval );
+let s = new Schedule({
+    // workingPattern: nineElevenScheduleConf,
+    excludePattern: nineElevenScheduleConf
+})
 
-nineElevenSchedule.addWorkingExplicit(today);
-console.log( nineElevenSchedule.query(okInterval) );
+let testVal = new ConcreteInterval(twelve)
+console.log( s.query(testVal) );

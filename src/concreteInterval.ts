@@ -66,6 +66,24 @@ export class ConcreteInterval {
             return new ConcreteInterval(this.start, interval.end);
         }
 
+        if(interval.contains(this)) return this;
+
+        return undefined;
+    }
+
+    public softIntersect(interval: ConcreteInterval) {
+        if(this.softContains(interval)) return interval;
+
+        if(this.softContains(interval.start) && !this.softContains(interval.end)) {
+            return new ConcreteInterval(interval.start, this.end);
+        }
+
+        if(this.softContains(interval.end) && !this.softContains(interval.start)) {
+            return new ConcreteInterval(this.start, interval.end);
+        }
+
+        if(interval.softContains(this)) return this;
+
         return undefined;
     }
 
@@ -124,10 +142,10 @@ export class ConcreteInterval {
                 let startSeconds = start.getSeconds();
                 let startMseconds = start.getMilliseconds();
 
-                let endHours = start.getHours();
-                let endMinutes = start.getMinutes();
-                let endSeconds = start.getSeconds();
-                let endMseconds = start.getMilliseconds();
+                let endHours = end.getHours();
+                let endMinutes = end.getMinutes();
+                let endSeconds = end.getSeconds();
+                let endMseconds = end.getMilliseconds();
 
                 return this.contains(new ConcreteInterval(
                     new Date(new Date(this.start.getTime()).setHours(startHours, startMinutes, startSeconds, startMseconds)),
