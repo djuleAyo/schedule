@@ -1,7 +1,10 @@
-add soft intersect
-make pattern queries on soft intersect not on contains
 implement exclude specific
-hard test limits etc
+test limits
+stress test
+
+cooldown conf
+duration conf
 
 make conf handler
 make a component
+ship

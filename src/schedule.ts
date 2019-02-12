@@ -18,6 +18,7 @@ export class Schedule {
     readonly workingPattern: Schedule.Conf = {};
     public workingExplicit: Array<ConcreteInterval> = [];
     readonly excludePattern: Schedule.Conf = {};
+    public excludeExplicit: Array<ConcreteInterval> = [];
 
     /**
      * With no arguments the schedule represents timeline. It is infinite.
@@ -84,14 +85,19 @@ export class Schedule {
         // the pipeline of checking conditions:
         // explecitExclude && excludePattern && (workingExplicit || workingPattern) && appointments
 
-        return this.queryExcludePattern(interval)
-            && (this.queryWorkingExplicit(interval) || this.queryWorkingPattern(interval)) 
+        return this.queryExcludeExplicit(interval)
+            && this.queryExcludePattern(interval)
+            && (this.queryWorkingExplicit(interval) || this.queryWorkingPattern(interval))
             && this.queryAppointments(interval);
     }
     
     public addWorkingExplicit(interval: ConcreteInterval): void
     {
         this.workingExplicit.push(interval);
+    }
+    public addExcludeExplicit(interval: ConcreteInterval): void
+    {
+        this.excludeExplicit.push(interval);
     }
 
     public removeWorkingExplicit(interval: ConcreteInterval): void
@@ -134,6 +140,15 @@ export class Schedule {
         this.workingExplicit.forEach(workingInterval => {
             if (workingInterval.contains(interval)) retVal = true;
         });
+        return retVal;
+    }
+
+    private queryExcludeExplicit(interval: ConcreteInterval): boolean
+    {
+        let retVal = true;
+        this.excludeExplicit.forEach(excludedInterval => {
+            if (excludedInterval.intersect(interval)) retVal = false;
+        })
         return retVal;
     }
 

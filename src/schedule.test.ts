@@ -114,9 +114,6 @@ describe('Schedule', () => {
             assert.isOk(nineElevenSchedule.appoint(
                 new ConcreteInterval(new Date(new Date().setHours(10, 0, 0, 0)))
             ));
-            // assert.isOk(!nineElevenSchedule.query(
-            //     new ConcreteInterval(new Date(new Date().setHours(10)))
-            // ));
 
             assert.isOk(nineElevenSchedule.query(new ConcreteInterval(
                 new Date(ten.getTime() + ms.minutes), 
