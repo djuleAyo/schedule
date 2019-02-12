@@ -109,17 +109,20 @@ describe('Schedule', () => {
                 new ConcreteInterval(new Date(new Date().setHours(12)))
             ));
             assert.isOk(nineElevenSchedule.query(
-                new ConcreteInterval(new Date(new Date().setHours(10)))
+                new ConcreteInterval(new Date(new Date().setHours(10, 0, 0, 0)))
             ));
             assert.isOk(nineElevenSchedule.appoint(
-                new ConcreteInterval(new Date(new Date().setHours(10)))
+                new ConcreteInterval(new Date(new Date().setHours(10, 0, 0, 0)))
             ));
-            assert.isOk(!nineElevenSchedule.query(
-                new ConcreteInterval(new Date(new Date().setHours(10)))
-            ));
+            // assert.isOk(!nineElevenSchedule.query(
+            //     new ConcreteInterval(new Date(new Date().setHours(10)))
+            // ));
 
-            assert.isOk(nineElevenSchedule.query(new ConcreteInterval(ten, eleven)));
-            // assert.isOk(!nineElevenSchedule.query(new ConcreteInterval(ten, twelve)));
+            assert.isOk(nineElevenSchedule.query(new ConcreteInterval(
+                new Date(ten.getTime() + ms.minutes), 
+                new Date(eleven.getTime() - ms.minutes), 
+                )));
+            assert.isOk(!nineElevenSchedule.query(new ConcreteInterval(ten, twelve)));
         });
     });
 
